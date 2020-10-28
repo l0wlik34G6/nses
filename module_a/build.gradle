@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'at.lowlik.nses'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation 'at.lowlik.nses:escore'
+
+    // NoSQL
+    compile group: 'org.mongodb', name: 'mongodb-driver', version: '3.6.3'
+
+    implementation 'com.github.javafaker:javafaker:1.0.2'
+
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

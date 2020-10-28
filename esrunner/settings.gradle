@@ -1,0 +1,6 @@
+rootProject.name = 'esrunner'
+
+includeBuild '../escore'
+includeBuild '../module_a'
+includeBuild '../module_b'
+
