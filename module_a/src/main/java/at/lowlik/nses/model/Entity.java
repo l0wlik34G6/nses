@@ -1,5 +1,6 @@
 package at.lowlik.nses.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,9 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Entity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+public class Entity extends EventObject {
 
-  private int entityId;
-  private EntityData data;
+  private long entityId;
 
 }
+

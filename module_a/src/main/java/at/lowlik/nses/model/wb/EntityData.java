@@ -1,4 +1,4 @@
-package at.lowlik.nses.model;
+package at.lowlik.nses.model.wb;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

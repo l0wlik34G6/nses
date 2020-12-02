@@ -4,13 +4,16 @@ public class ESRunner {
 
   public static void main(String[] args) {
 
-    new WorkBufferLoad().loadDummyWorkBuffer();
+    try {
 
-    new Conversion().run("TYPE-A", "EN");
+      new WorkBufferLoad().loadDummyWorkBuffer();
 
-//    new Conversion().run("TYPE-B", "EN");
+      new Conversion().run("TYPE-A", "EN");
+//      new Conversion().run("TYPE-B", "EN");
 
-    DbHelper.getInstance().close();
+    } finally {
+      DbHelper.getInstance().close();
+    }
   }
 
 }

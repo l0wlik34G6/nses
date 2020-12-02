@@ -1,11 +1,11 @@
 package at.lowlik.nses.model;
 
+import at.lowlik.nses.JSONObject;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.bson.Document;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -13,25 +13,20 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
-public class ModuleA extends Document {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class EventObject {
 
+  @EqualsAndHashCode.Include
   private ObjectId id;
 
-  @BsonProperty(value = "firstname")
-  private String firstName;
+  private Document data;
 
-  @BsonProperty(value = "lastname")
-  private String lastName;
-
-  private Date birth;
-
-  @BsonProperty(value = "content")
   private String content;
 
   private int version;
 
+  private Date changeDate;
+
   private char changeType;
 
 }
-

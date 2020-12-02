@@ -1,6 +1,7 @@
 package at.lowlik.nses;
 
 import at.lowlik.nses.model.Content;
+import at.lowlik.nses.model.EventObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.extern.java.Log;
@@ -23,10 +24,10 @@ public class Conversion {
 
     MongoCollection<Content> contentCollection = coreDatabase.getCollection("content", Content.class);
 
-    List<ConversionManager<? extends ESServiceProvider>> managerList = new ArrayList<>();
+    List<ConversionManager<? extends EventObject>> managerList = new ArrayList<>();
 
     ServiceLoad.providers(true).forEachRemaining(conversionProvider -> {
-      ConversionManager<? extends ESServiceProvider> manager = conversionProvider.create();
+      ConversionManager<? extends EventObject> manager = conversionProvider.create();
       if (manager.isEnabled() &&
           (manager.getType() == null || type.equals(manager.getType())) &&
           (manager.getLanguage() == null || language.equals(manager.getLanguage()))) {
@@ -36,7 +37,7 @@ public class Conversion {
 
     Collections.sort(managerList);
 
-    for (ConversionManager<? extends ESServiceProvider> manager : managerList) {
+    for (ConversionManager<? extends EventObject> manager : managerList) {
       content = contentCollection.find(eq("contentId", manager.getRepositoryClass().getSimpleName())).first();
       if (content == null) {
         content = new Content();
@@ -44,16 +45,22 @@ public class Conversion {
         content.setVersion(0);
         contentCollection.insertOne(content);
       }
-      log.info("Content: " + content.toJson(JsonWriterSettings.builder().build()));
+      log.info("Content: " + content.toString());
       manager.setWorkBufferDatabase(DbHelper.getInstance().getDatabase("workBufferDb"));
       manager.setDatabase(DbHelper.getInstance().getDatabase(manager.getRepositoryClass().getSimpleName()));
 
       if (manager.hasChanges()) {
-        incrementContentVersion(manager, contentCollection);
-        manager.preConversion();
-        manager.conversion();
-        manager.postConversion();
-        manager.cleanUp();
+        manager.setVersion(content.getVersion() + 1);
+        try {
+          manager.preConversion();
+          manager.conversion();
+          manager.postConversion();
+          manager.cleanUp();
+          incrementContentVersion(manager, contentCollection);
+        } catch(Exception ex) {
+          log.severe(ex.getMessage());
+          ex.printStackTrace();
+        }
       } else {
         manager.noChangesAction();
       }
@@ -61,11 +68,9 @@ public class Conversion {
 
   }
 
-  private void incrementContentVersion(ConversionManager<? extends ESServiceProvider> manager, MongoCollection<Content> contentCollection) {
-    content.append("version", 0);
+  private void incrementContentVersion(ConversionManager<? extends EventObject> manager, MongoCollection<Content> contentCollection) {
+    content.setVersion(content.getVersion() + 1);
     contentCollection.replaceOne(eq("contentId", manager.getRepositoryClass().getSimpleName()), content);
-
-    manager.setVersion(content.getInteger("version"));
   }
 
 }
